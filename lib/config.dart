@@ -1,12 +1,18 @@
 /// App-wide settings.
 ///
-/// [apiBaseUrl] depends on where the backend runs:
-///   - Android emulator, backend on this machine: http://10.0.2.2:8000
-///   - Physical phone on the same Wi-Fi: http://<laptop-LAN-IP>:8000
-///     (start uvicorn with --host 0.0.0.0 so it accepts LAN connections)
-///   - Deployed backend: its public HTTPS URL
+/// [apiBaseUrl] defaults to the deployed backend on Render. For local
+/// development, override it at build time:
+///
+///   flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+///
+/// 10.0.2.2 is the Android emulator's alias for the host machine. On a
+/// physical phone use the laptop's LAN IP instead, and start uvicorn with
+/// --host 0.0.0.0 so it accepts LAN connections.
 class AppConfig {
-  static const String apiBaseUrl = "http://10.0.2.2:8000";
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://roadsense-backend-t98l.onrender.com',
+  );
 
   // How often a GPS reading is saved + sent to the backend.
   static const Duration readingInterval = Duration(seconds: 1);
