@@ -13,7 +13,8 @@ The system has two parts: this Flutter app and a Python backend.
 1. Streams GPS readings (timestamp, lat/lng, speed) to the backend while tracking is on.
 2. Loads all known bumps and shows them on an OpenStreetMap map.
 3. Shows a "Speed Bump Ahead" banner and speaks a voice alert as you approach one (first at 400 m, again at 60 m).
-4. Shows nearby named places from the Overpass API and exports the trip as CSV.
+4. When you stop a trip, triggers bump detection on the backend and refreshes the markers with the result.
+5. Shows nearby named places from the Overpass API and exports the trip as CSV.
 
 **Backend (FastAPI, hosted on Render)**
 
@@ -22,7 +23,7 @@ The system has two parts: this Flutter app and a Python backend.
 3. Computes features for each event (speed before, minimum speed, drop, drop %, deceleration, recovery time, jerk) and runs them through a scikit-learn Random Forest classifier. Events above 0.70 confidence are kept.
 4. Crowd validation: a bump is marked confirmed once it has been detected at least twice within 20 m.
 
-The current model is trained on synthetic data shaped after real bump and non-bump slowdowns.
+The current model is trained on synthetic sensor data; real-world data collection is the next step.
 
 ### API used by the app
 
@@ -30,7 +31,7 @@ The current model is trained on synthetic data shaped after real bump and non-bu
 | --- | --- | --- |
 | POST | `/trip-data` | Send one GPS reading |
 | GET | `/bumps` | All detected bumps |
-| POST | `/detect-bumps` | Run detection on uploaded trip data |
+| POST | `/detect-bumps` | Run detection on uploaded trip data (called when a trip ends) |
 
 ## Tech stack
 
@@ -49,7 +50,17 @@ flutter pub get
 flutter run
 ```
 
-Set the backend URL in `lib/config.dart` (`apiBaseUrl`). The default, `http://10.0.2.2:8000`, points an Android emulator at a backend running on the same machine. Alert distances and the reading interval are in the same file.
+By default the app talks to the deployed backend at `https://roadsense-backend-t98l.onrender.com`. It runs on Render's free tier, so the first request after a period of inactivity can take over a minute while the server wakes up.
+
+To use a backend running locally instead, pass its URL at build time:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+```
+
+`10.0.2.2` is how the Android emulator reaches the host machine. On a physical phone, use your laptop's LAN IP and start the backend with `uvicorn main:app --host 0.0.0.0 --port 8000`.
+
+Alert distances, the reading interval and timeouts are in `lib/config.dart`.
 
 ## Project structure
 
