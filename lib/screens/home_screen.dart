@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _tripTimerTicker;
 
   bool _tracking = false;
+  bool _detecting = false;
   DateTime? _startTime;
   Duration _tripDuration = Duration.zero;
 
@@ -97,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadBumps() async {
     try {
       final bumps = await _api.getBumps();
+      if (!mounted) return;
       setState(() => _bumps = bumps);
 
       if (bumps.isNotEmpty) {
@@ -115,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _startTracking() async {
-    if (_tracking) return;
+    if (_tracking || _detecting) return;
 
     try {
       await _locationService.ensureReady();
@@ -245,6 +247,41 @@ class _HomeScreenState extends State<HomeScreen> {
       _connectionText = 'Ready';
       _speedKmh = 0;
     });
+
+    _runDetection();
+  }
+
+  Future<void> _runDetection() async {
+    if (_tripData.isEmpty) return;
+
+    final readings = _tripData.length;
+    setState(() {
+      _detecting = true;
+      _trackingStatusTitle = 'Analyzing Trip';
+      _trackingStatusMessage =
+          'Running bump detection. This can take a minute or two if the server is waking up.';
+    });
+
+    try {
+      final detected = await _api.runDetection();
+      await _loadBumps();
+      if (!mounted) return;
+      setState(() {
+        _trackingStatusTitle = 'Trip Analyzed';
+        _trackingStatusMessage =
+            '$readings GPS readings collected, $detected bump${detected == 1 ? '' : 's'} detected.';
+      });
+    } catch (e) {
+      debugPrint('Bump detection failed: $e');
+      if (!mounted) return;
+      setState(() {
+        _trackingStatusTitle = 'Detection Failed';
+        _trackingStatusMessage =
+            'Could not reach the server. $readings GPS readings collected.';
+      });
+    } finally {
+      if (mounted) setState(() => _detecting = false);
+    }
   }
 
   Future<void> _downloadCsv() async {
@@ -343,6 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
               readingCount: _tripData.length,
               tripTime: _tripTimeText,
               isTracking: _tracking,
+              isDetecting: _detecting,
               hasTripData: _tripData.isNotEmpty,
               trackingStatusTitle: _trackingStatusTitle,
               trackingStatusMessage: _trackingStatusMessage,

@@ -7,6 +7,7 @@ class ControlPanel extends StatelessWidget {
   final int readingCount;
   final String tripTime;
   final bool isTracking;
+  final bool isDetecting;
   final bool hasTripData;
   final String trackingStatusTitle;
   final String trackingStatusMessage;
@@ -21,6 +22,7 @@ class ControlPanel extends StatelessWidget {
     required this.readingCount,
     required this.tripTime,
     required this.isTracking,
+    required this.isDetecting,
     required this.hasTripData,
     required this.trackingStatusTitle,
     required this.trackingStatusMessage,
@@ -114,7 +116,7 @@ class ControlPanel extends StatelessWidget {
             width: double.infinity,
             height: 48,
             child: ElevatedButton.icon(
-              onPressed: isTracking ? null : onStart,
+              onPressed: isTracking || isDetecting ? null : onStart,
               icon: const Icon(Icons.play_arrow, size: 18),
               label: const Text('Start Tracker'),
               style: ElevatedButton.styleFrom(
@@ -174,15 +176,28 @@ class ControlPanel extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  width: 9,
-                  height: 9,
-                  decoration: BoxDecoration(
-                    color: isTracking ? AppColors.dotActive : AppColors.dotIdle,
-                    shape: BoxShape.circle,
+                if (isDetecting)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    width: 9,
+                    height: 9,
+                    decoration: BoxDecoration(
+                      color: isTracking ? AppColors.dotActive : AppColors.dotIdle,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
