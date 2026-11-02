@@ -34,7 +34,7 @@ class ApiService {
   Future<List<Bump>> getBumps() async {
     final response = await http
         .get(Uri.parse('$baseUrl/bumps'))
-        .timeout(const Duration(seconds: 10));
+        .timeout(AppConfig.coldStartTimeout);
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch bumps (${response.statusCode})');
@@ -47,14 +47,12 @@ class ApiService {
         .toList();
   }
 
-  /// POST /detect-bumps — trigger the ML detection pass on whatever
-  /// trip data has been uploaded so far. Not called automatically by
-  /// the original prototype's frontend, but exposed here in case you
-  /// want a "Run Detection" button.
+  /// POST /detect-bumps — run the ML detection pass over all uploaded
+  /// trip data. The backend replaces its bump list with the result.
   Future<int> runDetection() async {
     final response = await http
         .post(Uri.parse('$baseUrl/detect-bumps'))
-        .timeout(const Duration(seconds: 30));
+        .timeout(AppConfig.coldStartTimeout);
 
     if (response.statusCode != 200) {
       throw Exception('Detection failed (${response.statusCode})');

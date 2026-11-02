@@ -14,6 +14,10 @@ class AppConfig {
     defaultValue: 'https://roadsense-backend-t98l.onrender.com',
   );
 
+  // Render's free tier sleeps when idle and the first request after that
+  // can take well over a minute, so slow calls get a generous timeout.
+  static const Duration coldStartTimeout = Duration(seconds: 120);
+
   // How often a GPS reading is saved + sent to the backend.
   static const Duration readingInterval = Duration(seconds: 1);
 
