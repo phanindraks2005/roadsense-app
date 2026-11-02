@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config.dart';
 import '../models/bump.dart';
@@ -22,12 +23,10 @@ class ApiService {
           .timeout(const Duration(seconds: 8));
 
       if (response.statusCode != 200) {
-        // ignore: avoid_print
-        print('Backend returned HTTP ${response.statusCode}');
+        debugPrint('Backend returned HTTP ${response.statusCode}');
       }
     } catch (e) {
-      // ignore: avoid_print
-      print('Backend connection error: $e');
+      debugPrint('Backend connection error: $e');
     }
   }
 

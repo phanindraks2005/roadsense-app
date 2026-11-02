@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config.dart';
 import '../models/trip_point.dart';
@@ -20,8 +21,7 @@ class OverpassService {
         final places = await _fetch(lat, lng);
         onResult(places);
       } catch (e) {
-        // ignore: avoid_print
-        print('Nearby places error: $e');
+        debugPrint('Nearby places error: $e');
       }
     });
   }

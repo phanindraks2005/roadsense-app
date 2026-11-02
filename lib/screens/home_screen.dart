@@ -110,8 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      // ignore: avoid_print
-      print('Could not load bump markers: $e');
+      debugPrint('Could not load bump markers: $e');
     }
   }
 
