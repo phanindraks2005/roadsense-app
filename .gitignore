@@ -52,3 +52,9 @@ app.*.map.json
 .env.*
 *.pem
 *.p12
+
+# editor and assistant files
+.vscode/
+.claude/
+CLAUDE.md
+AGENTS.md
