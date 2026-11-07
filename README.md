@@ -2,6 +2,8 @@
 
 An Android app that detects speed bumps from GPS speed data and warns drivers before they reach one.
 
+**Case study:** [phanindra-ks.vercel.app/projects/roadsense](https://phanindra-ks.vercel.app/projects/roadsense)
+
 The phone records location and speed once a second while you drive. A sharp drop in speed followed by a quick recovery is the signature of a speed bump; slowing for traffic or a turn looks different. The backend classifies these events and stores confirmed bumps, which every user then sees on the map.
 
 ## How it works
